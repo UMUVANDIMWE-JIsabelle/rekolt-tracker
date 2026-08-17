@@ -6,6 +6,10 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static final double COMMISSION_RATE = 0.05;
+    private static final double TRANSPORT_LEVY_PER_KG = 2.0;
+    private static final double MAX_MASS_KG = 5000.0;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ConsoleInput input = new ConsoleInput(scanner);
@@ -108,8 +112,8 @@ public class Main {
         };
         double afterCategory = afterGrade * categoryMultiplier;
 
-        double commission = afterCategory * 0.05;
-        double transportLevy = massKg * 2;
+        double commission = afterCategory * COMMISSION_RATE;
+        double transportLevy = massKg * TRANSPORT_LEVY_PER_KG;
 
         return round2(afterCategory - commission - transportLevy);
     }
