@@ -170,11 +170,14 @@ public class Main {
         System.out.println();
         System.out.println("Deliveries processed this season: " + SEASON_PRODUCE.length);
     }
-
-    //Finds which column a produce code belongs to in the grid. Returns -1 if not found.
+// Finds which column a produce code belongs to in the fixed grid. Returns -1 if not found.
     private static int indexOfProduce(String code) {
-        for (int i = 0; i < PRODUCE_CODES.length; i++) {
-            if (PRODUCE_CODES[i].equals(code)) {
+        return indexOfProduce(code, PRODUCE_CODES);
+    }
+    //Overload: finds a code's index in ANY array you give it, not just PRODUCE_CODES.
+    private static int indexOfProduce(String code, String[] codes) {
+        for (int i = 0; i < codes.length; i++) {
+            if (codes[i].equals(code)) {
                 return i;
             }
         }
