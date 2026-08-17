@@ -91,6 +91,13 @@ public class Main {
 
     // Runs one delivery through the five payment steps.
     private static double calculateNetPayable(String produceCode, double massKg, int qualityScore) {
+        String grade = gradeFor(qualityScore);
+
+        // A REJECT delivery earns nothing, and nothing is deducted from it either.
+        if (grade.equals("REJECT")) {
+            return 0.0;
+        }
+
         double basePricePerKg;
         String category;
         switch (produceCode) {
@@ -102,7 +109,7 @@ public class Main {
         }
 
         double baseValue = massKg * basePricePerKg;
-        double afterGrade = baseValue * gradeMultiplierFor(gradeFor(qualityScore));
+        double afterGrade = baseValue * gradeMultiplierFor(grade);
 
         double categoryMultiplier = switch (category) {
             case "CEREAL" -> 1.00;
