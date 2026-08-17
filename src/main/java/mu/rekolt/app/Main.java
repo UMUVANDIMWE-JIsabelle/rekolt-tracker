@@ -17,8 +17,8 @@ public class Main {
 
             switch (choice) {
                 case 1 -> recordDelivery(input);
-                case 2 -> System.out.println("Season figures coming in a later step.");
-                case 3 -> System.out.println("Report generation coming in Objective 6.");
+                case 2 -> showSeasonFigures();
+                case 3 -> System.out.println("Report generating ...");
                 case 4 -> {
                     System.out.println("Goodbye.");
                     running = false;
@@ -116,5 +116,68 @@ public class Main {
 
     private static double round2(double value) {
         return (double) Math.round(value * 100) / 100;
+    }
+
+    // A season's worth of deliveries, hardcoded for testing. Each index across these arrays describes one delivery (same position = same delivery).
+    private static final String[] SEASON_PRODUCE = {
+            "BNS", "MZE", "POT", "TEA", "MZE", "BNS",
+            "POT", "TEA", "MZE", "BNS", "POT", "MZE"
+    };
+    private static final double[] SEASON_MASS = {
+            236.0, 180.0, 150.0, 88.3, 232.5, 210.0,
+            95.0, 60.0, 300.0, 175.5, 120.0, 140.0
+    };
+    private static final int[] SEASON_QUALITY = {
+            91, 78, 65, 40, 88, 72,
+            55, 30, 95, 60, 82, 68
+    };
+    private static final int[] SEASON_WEEK = {
+            1, 1, 2, 2, 3, 3,
+            4, 4, 5, 5, 6, 6
+    };
+    private static final String[] PRODUCE_CODES = {"MZE", "BNS", "POT", "TEA"};
+
+    private static void showSeasonFigures() {
+        System.out.println();
+        System.out.println("Weekly volume grid (kg)");
+
+        int weekCount = 6;
+        // rows = weeks, columns = the four produce codes, built with a NESTED loop
+        double[][] weeklyGrid = new double[weekCount][PRODUCE_CODES.length];
+
+        for (int i = 0; i < SEASON_PRODUCE.length; i++) {
+            int weekIndex = SEASON_WEEK[i] - 1;
+            int produceIndex = indexOfProduce(SEASON_PRODUCE[i]);
+            weeklyGrid[weekIndex][produceIndex] += SEASON_MASS[i];
+        }
+
+        System.out.print("  Week ");
+        for (String code : PRODUCE_CODES) {
+            System.out.printf("%8s", code);
+        }
+        System.out.println("   Total");
+
+        for (int week = 0; week < weekCount; week++) {
+            System.out.printf("  %4d ", week + 1);
+            double rowTotal = 0;
+            for (int col = 0; col < PRODUCE_CODES.length; col++) {
+                System.out.printf("%8.1f", weeklyGrid[week][col]);
+                rowTotal += weeklyGrid[week][col];
+            }
+            System.out.printf("%9.1f%n", rowTotal);
+        }
+
+        System.out.println();
+        System.out.println("Deliveries processed this season: " + SEASON_PRODUCE.length);
+    }
+
+    //Finds which column a produce code belongs to in the grid. Returns -1 if not found.
+    private static int indexOfProduce(String code) {
+        for (int i = 0; i < PRODUCE_CODES.length; i++) {
+            if (PRODUCE_CODES[i].equals(code)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
