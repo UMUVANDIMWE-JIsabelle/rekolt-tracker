@@ -61,6 +61,11 @@ public class Main {
         double netPayable = calculateNetPayable(produceCode, massKg, qualityScore);
         String grade = gradeFor(qualityScore);
 
+        printDeliveryResult(memberId, memberName, grade, netPayable);
+    }
+
+    //  Prints the outcome of a single recorded delivery.
+    private static void printDeliveryResult(String memberId, String memberName, String grade, double netPayable) {
         System.out.println();
         System.out.printf("Delivery recorded for %s (%s). Grade %s%n", memberName, memberId, grade);
         System.out.printf("  NET PAYABLE = %.2f MUR%n", netPayable);
