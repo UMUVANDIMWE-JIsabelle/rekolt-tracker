@@ -28,7 +28,7 @@ git clone https://github.com/UMUVANDIMWE-JIsabelle/rekolt-tracker.git
 cd rekolt-tracker
 ```
 
-Whe  you open the folder in IntelliJ IDEA ... it detects `pom.xml` automatically
+Open the folder in IntelliJ IDEA ... it detects `pom.xml` automatically
 and sets up Maven. Then run the entry point:
 
 - Open `src/main/java/mu/rekolt/app/Main.java`
@@ -61,7 +61,6 @@ no deductions are taken from it.
   rounded to 2 decimals, using an explicit `(double)` cast on the
   result of `Math.round()` (which returns a `long`).
 
-## Project structure
 
 ## Author
 
