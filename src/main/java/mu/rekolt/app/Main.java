@@ -9,6 +9,9 @@ import mu.rekolt.model.Delivery;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main {
 
     private static final double COMMISSION_RATE = 0.05;
@@ -16,6 +19,8 @@ public class Main {
     private static final double MAX_MASS_KG = 5000.0;
 
     private static final List<Delivery> deliveries = new ArrayList<>();
+
+    private static final Map<String, Double> totalPaymentPerMember = new HashMap<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -70,6 +75,9 @@ public class Main {
 
         Delivery delivery = new Delivery(memberId, memberName, produceCode, massKg, qualityScore, week, grade, netPayable);
         deliveries.add(delivery);
+
+        double previousTotal = totalPaymentPerMember.getOrDefault(memberId, 0.0);
+        totalPaymentPerMember.put(memberId, previousTotal + netPayable);
 
         printDeliveryResult(memberId, memberName, grade, netPayable);
     }
@@ -164,6 +172,11 @@ public class Main {
     private static final String[] PRODUCE_CODES = {"MZE", "BNS", "POT", "TEA"};
 
     private static void showSeasonFigures() {
+        System.out.println();
+        System.out.println("Total payment per member (MUR)");
+        for (Map.Entry<String, Double> entry : totalPaymentPerMember.entrySet()) {
+            System.out.printf("  %s  %10.2f%n", entry.getKey(), entry.getValue());
+        }
         System.out.println();
         System.out.println("Weekly volume grid (kg)");
 
