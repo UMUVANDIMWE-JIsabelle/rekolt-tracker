@@ -4,11 +4,18 @@ import mu.rekolt.util.ConsoleInput;
 
 import java.util.Scanner;
 
+import mu.rekolt.model.Delivery;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
 
     private static final double COMMISSION_RATE = 0.05;
     private static final double TRANSPORT_LEVY_PER_KG = 2.0;
     private static final double MAX_MASS_KG = 5000.0;
+
+    private static final List<Delivery> deliveries = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -41,7 +48,7 @@ public class Main {
         System.out.println();
     }
 
-    //asks for one delivery's details and prints its net payable.
+    //asks for one delivery's details, records it and prints its net payable.
     private static void recordDelivery(ConsoleInput input) {
         String memberId = input.readMatching(
                 "Member identifier              : ",
@@ -60,6 +67,9 @@ public class Main {
 
         double netPayable = calculateNetPayable(produceCode, massKg, qualityScore);
         String grade = gradeFor(qualityScore);
+
+        Delivery delivery = new Delivery(memberId, memberName, produceCode, massKg, qualityScore, week, grade, netPayable);
+        deliveries.add(delivery);
 
         printDeliveryResult(memberId, memberName, grade, netPayable);
     }
