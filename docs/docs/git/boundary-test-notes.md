@@ -17,3 +17,16 @@ each boundary value as the quality score.
   multiplier had already zeroed the value out. Fixed by returning 0.0
   immediately once a delivery is graded REJECT, before any commission
   or levy calculation runs.
+
+
+## Mass boundary verification 
+
+| Mass entered | Expected | Result                            |
+|---|---|-----------------------------------|
+| 5000 | Accepted (inclusive upper bound) | ✔ Accepted                        |
+| 5005 | Rejected, re-prompt | ✔Rejected, re-prompted, no crash  |
+| 0 | Rejected, re-prompt (mass must be strictly > 0) | ✔ Rejected, re-prompted, no crash |
+
+Also confirmed the menu itself never crashes on bad input: entering
+"a" as the menu choice printed a clear error and re-asked, rather
+than throwing an exception.
