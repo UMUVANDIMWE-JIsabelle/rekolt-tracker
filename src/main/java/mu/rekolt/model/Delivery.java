@@ -1,6 +1,6 @@
 package mu.rekolt.model;
 
-public class Delivery {
+public class Delivery implements Comparable<Delivery> {
 
     private final String memberId;
     private final String memberName;
@@ -32,6 +32,12 @@ public class Delivery {
     public int getWeek() { return week; }
     public String getGrade() { return grade; }
     public double getNetPayable() { return netPayable; }
+
+    // Natural ordering: highest net payable first.
+    @Override
+    public int compareTo(Delivery other) {
+        return Double.compare(other.netPayable, this.netPayable);
+    }
 
     @Override
     public String toString() {

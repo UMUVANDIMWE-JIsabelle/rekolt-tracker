@@ -222,6 +222,14 @@ public class Main {
 
         System.out.println();
         System.out.println("Deliveries processed this season: " + SEASON_PRODUCE.length);
+
+        System.out.println();
+        System.out.println("All deliveries, highest value first");
+        List<Delivery> sortedByValue = new ArrayList<>(deliveries);
+        java.util.Collections.sort(sortedByValue);
+        for (Delivery d : sortedByValue) {
+            System.out.println("  " + d);
+        }
     }
 // Finds which column a produce code belongs to in the fixed grid. Returns -1 if not found.
     private static int indexOfProduce(String code) {
