@@ -1,16 +1,13 @@
 package mu.rekolt.app;
-
 import mu.rekolt.util.ConsoleInput;
-
 import java.util.Scanner;
-
 import mu.rekolt.model.Delivery;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
 
@@ -19,10 +16,9 @@ public class Main {
     private static final double MAX_MASS_KG = 5000.0;
 
     private static final List<Delivery> deliveries = new ArrayList<>();
-
     private static final Map<String, Double> totalPaymentPerMember = new HashMap<>();
-
     private static final Map<String, List<Delivery>> deliveriesByMember = new HashMap<>();
+    private static final Set<String> memberIds = new HashSet<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -84,6 +80,8 @@ public class Main {
         deliveriesByMember
                 .computeIfAbsent(memberId, key -> new ArrayList<>())
                 .add(delivery);
+
+        memberIds.add(memberId);
 
         printDeliveryResult(memberId, memberName, grade, netPayable);
     }
@@ -178,6 +176,9 @@ public class Main {
     private static final String[] PRODUCE_CODES = {"MZE", "BNS", "POT", "TEA"};
 
     private static void showSeasonFigures() {
+        System.out.println();
+        System.out.printf("Distinct members this season: %d%n", memberIds.size());
+
         System.out.println();
         System.out.println("Total payment per member (MUR)");
         for (Map.Entry<String, Double> entry : totalPaymentPerMember.entrySet()) {
