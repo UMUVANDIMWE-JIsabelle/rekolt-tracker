@@ -20,6 +20,7 @@ public class Main {
     private static final Map<String, List<Delivery>> deliveriesByMember = new HashMap<>();
     private static final Set<String> memberIds = new HashSet<>();
 
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ConsoleInput input = new ConsoleInput(scanner);
@@ -232,7 +233,7 @@ public class Main {
         }
 
         System.out.println();
-        System.out.println("All deliveries, grouped by member then week (Comparator)");
+        System.out.println("All deliveries, grouped by member then week");
         List<Delivery> sortedByMemberThenWeek = new ArrayList<>(deliveries);
         sortedByMemberThenWeek.sort(
                 java.util.Comparator.comparing(Delivery::getMemberId)
@@ -240,6 +241,27 @@ public class Main {
         );
         for (Delivery d : sortedByMemberThenWeek) {
             System.out.println("  " + d);
+        }
+
+        System.out.println();
+        System.out.println("Search test: deliveries for M-0999");
+        List<Delivery> found = findDeliveriesByMemberId("M-0999");
+        if (found.isEmpty()) {
+            System.out.println("  No deliveries found for this member.");
+        } else {
+            for (Delivery d : found) {
+                System.out.println("  " + d);
+            }
+        }
+
+        System.out.println("Search test: deliveries for M-9999 (should not exist)");
+        List<Delivery> notFound = findDeliveriesByMemberId("M-9999");
+        if (notFound.isEmpty()) {
+            System.out.println("  No deliveries found for this member.");
+        } else {
+            for (Delivery d : notFound) {
+                System.out.println("  " + d);
+            }
         }
     }
 // Finds which column a produce code belongs to in the fixed grid. Returns -1 if not found.
@@ -254,5 +276,12 @@ public class Main {
             }
         }
         return -1;
+    }
+    private static List<Delivery> findDeliveriesByMemberId(String memberId) {
+        List<Delivery> result = deliveriesByMember.get(memberId);
+        if (result == null) {
+            return new ArrayList<>(); // member not found -- return empty, not null
+        }
+        return result;
     }
 }
