@@ -230,6 +230,17 @@ public class Main {
         for (Delivery d : sortedByValue) {
             System.out.println("  " + d);
         }
+
+        System.out.println();
+        System.out.println("All deliveries, grouped by member then week (Comparator)");
+        List<Delivery> sortedByMemberThenWeek = new ArrayList<>(deliveries);
+        sortedByMemberThenWeek.sort(
+                java.util.Comparator.comparing(Delivery::getMemberId)
+                        .thenComparingInt(Delivery::getWeek)
+        );
+        for (Delivery d : sortedByMemberThenWeek) {
+            System.out.println("  " + d);
+        }
     }
 // Finds which column a produce code belongs to in the fixed grid. Returns -1 if not found.
     private static int indexOfProduce(String code) {
