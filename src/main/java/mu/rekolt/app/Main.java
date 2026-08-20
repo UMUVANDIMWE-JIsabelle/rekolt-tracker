@@ -22,6 +22,8 @@ public class Main {
 
     private static final Map<String, Double> totalPaymentPerMember = new HashMap<>();
 
+    private static final Map<String, List<Delivery>> deliveriesByMember = new HashMap<>();
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ConsoleInput input = new ConsoleInput(scanner);
@@ -78,6 +80,10 @@ public class Main {
 
         double previousTotal = totalPaymentPerMember.getOrDefault(memberId, 0.0);
         totalPaymentPerMember.put(memberId, previousTotal + netPayable);
+
+        deliveriesByMember
+                .computeIfAbsent(memberId, key -> new ArrayList<>())
+                .add(delivery);
 
         printDeliveryResult(memberId, memberName, grade, netPayable);
     }
@@ -177,6 +183,13 @@ public class Main {
         for (Map.Entry<String, Double> entry : totalPaymentPerMember.entrySet()) {
             System.out.printf("  %s  %10.2f%n", entry.getKey(), entry.getValue());
         }
+
+        System.out.println();
+        System.out.println("Deliveries per member");
+        for (Map.Entry<String, List<Delivery>> entry : deliveriesByMember.entrySet()) {
+            System.out.printf("  %s: %d deliveries%n", entry.getKey(), entry.getValue().size());
+        }
+
         System.out.println();
         System.out.println("Weekly volume grid (kg)");
 
