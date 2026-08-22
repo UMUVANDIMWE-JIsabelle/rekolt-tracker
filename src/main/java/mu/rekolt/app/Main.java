@@ -33,7 +33,10 @@ public class Main {
             switch (choice) {
                 case 1 -> recordDelivery(input);
                 case 2 -> showSeasonFigures();
-                case 3 -> System.out.println("Report generating ...");
+                case 3 -> {
+                    int removed = removeRejectedDeliveries();
+                    System.out.printf("Removed %d REJECT deliveries. %d remain.%n", removed, deliveries.size());
+                }
                 case 4 -> {
                     System.out.println("Goodbye.");
                     running = false;
@@ -283,5 +286,25 @@ public class Main {
             return new ArrayList<>(); // member not found -- return empty, not null
         }
         return result;
+    }
+
+    // Removes all REJECT-graded deliveries from the season, using an Iterator so the list can be safely modified while being walked through. Keeps the per-member map in sync by removing from there too.
+    private static int removeRejectedDeliveries() {
+        int removedCount = 0;
+        java.util.Iterator<Delivery> iterator = deliveries.iterator();
+        while (iterator.hasNext()) {
+            Delivery d = iterator.next();
+            if (d.getGrade().equals("REJECT")) {
+                iterator.remove();
+
+                List<Delivery> memberList = deliveriesByMember.get(d.getMemberId());
+                if (memberList != null) {
+                    memberList.remove(d);
+                }
+
+                removedCount++;
+            }
+        }
+        return removedCount;
     }
 }
