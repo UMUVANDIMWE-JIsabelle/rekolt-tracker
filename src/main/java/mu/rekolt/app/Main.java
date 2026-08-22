@@ -1,14 +1,25 @@
 package mu.rekolt.app;
-
 import mu.rekolt.util.ConsoleInput;
-
 import java.util.Scanner;
+import mu.rekolt.model.Delivery;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
 
     private static final double COMMISSION_RATE = 0.05;
     private static final double TRANSPORT_LEVY_PER_KG = 2.0;
     private static final double MAX_MASS_KG = 5000.0;
+
+    private static final List<Delivery> deliveries = new ArrayList<>();
+    private static final Map<String, Double> totalPaymentPerMember = new HashMap<>();
+    private static final Map<String, List<Delivery>> deliveriesByMember = new HashMap<>();
+    private static final Set<String> memberIds = new HashSet<>();
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -22,7 +33,10 @@ public class Main {
             switch (choice) {
                 case 1 -> recordDelivery(input);
                 case 2 -> showSeasonFigures();
-                case 3 -> System.out.println("Report generating ...");
+                case 3 -> {
+                    int removed = removeRejectedDeliveries();
+                    System.out.printf("Removed %d REJECT deliveries. %d remain.%n", removed, deliveries.size());
+                }
                 case 4 -> {
                     System.out.println("Goodbye.");
                     running = false;
@@ -41,7 +55,7 @@ public class Main {
         System.out.println();
     }
 
-    //asks for one delivery's details and prints its net payable.
+    //asks for one delivery's details, records it and prints its net payable.
     private static void recordDelivery(ConsoleInput input) {
         String memberId = input.readMatching(
                 "Member identifier              : ",
@@ -60,6 +74,18 @@ public class Main {
 
         double netPayable = calculateNetPayable(produceCode, massKg, qualityScore);
         String grade = gradeFor(qualityScore);
+
+        Delivery delivery = new Delivery(memberId, memberName, produceCode, massKg, qualityScore, week, grade, netPayable);
+        deliveries.add(delivery);
+
+        double previousTotal = totalPaymentPerMember.getOrDefault(memberId, 0.0);
+        totalPaymentPerMember.put(memberId, previousTotal + netPayable);
+
+        deliveriesByMember
+                .computeIfAbsent(memberId, key -> new ArrayList<>())
+                .add(delivery);
+
+        memberIds.add(memberId);
 
         printDeliveryResult(memberId, memberName, grade, netPayable);
     }
@@ -155,6 +181,21 @@ public class Main {
 
     private static void showSeasonFigures() {
         System.out.println();
+        System.out.printf("Distinct members this season: %d%n", memberIds.size());
+
+        System.out.println();
+        System.out.println("Total payment per member (MUR)");
+        for (Map.Entry<String, Double> entry : totalPaymentPerMember.entrySet()) {
+            System.out.printf("  %s  %10.2f%n", entry.getKey(), entry.getValue());
+        }
+
+        System.out.println();
+        System.out.println("Deliveries per member");
+        for (Map.Entry<String, List<Delivery>> entry : deliveriesByMember.entrySet()) {
+            System.out.printf("  %s: %d deliveries%n", entry.getKey(), entry.getValue().size());
+        }
+
+        System.out.println();
         System.out.println("Weekly volume grid (kg)");
 
         int weekCount = 6;
@@ -185,6 +226,46 @@ public class Main {
 
         System.out.println();
         System.out.println("Deliveries processed this season: " + SEASON_PRODUCE.length);
+
+        System.out.println();
+        System.out.println("All deliveries, highest value first");
+        List<Delivery> sortedByValue = new ArrayList<>(deliveries);
+        java.util.Collections.sort(sortedByValue);
+        for (Delivery d : sortedByValue) {
+            System.out.println("  " + d);
+        }
+
+        System.out.println();
+        System.out.println("All deliveries, grouped by member then week");
+        List<Delivery> sortedByMemberThenWeek = new ArrayList<>(deliveries);
+        sortedByMemberThenWeek.sort(
+                java.util.Comparator.comparing(Delivery::getMemberId)
+                        .thenComparingInt(Delivery::getWeek)
+        );
+        for (Delivery d : sortedByMemberThenWeek) {
+            System.out.println("  " + d);
+        }
+
+        System.out.println();
+        System.out.println("Search test: deliveries for M-0999");
+        List<Delivery> found = findDeliveriesByMemberId("M-0999");
+        if (found.isEmpty()) {
+            System.out.println("  No deliveries found for this member.");
+        } else {
+            for (Delivery d : found) {
+                System.out.println("  " + d);
+            }
+        }
+
+        System.out.println("Search test: deliveries for M-9999 (should not exist)");
+        List<Delivery> notFound = findDeliveriesByMemberId("M-9999");
+        if (notFound.isEmpty()) {
+            System.out.println("  No deliveries found for this member.");
+        } else {
+            for (Delivery d : notFound) {
+                System.out.println("  " + d);
+            }
+        }
     }
 // Finds which column a produce code belongs to in the fixed grid. Returns -1 if not found.
     private static int indexOfProduce(String code) {
@@ -198,5 +279,32 @@ public class Main {
             }
         }
         return -1;
+    }
+    private static List<Delivery> findDeliveriesByMemberId(String memberId) {
+        List<Delivery> result = deliveriesByMember.get(memberId);
+        if (result == null) {
+            return new ArrayList<>(); // member not found -- return empty, not null
+        }
+        return result;
+    }
+
+    // Removes all REJECT-graded deliveries from the season, using an Iterator so the list can be safely modified while being walked through. Keeps the per-member map in sync by removing from there too.
+    private static int removeRejectedDeliveries() {
+        int removedCount = 0;
+        java.util.Iterator<Delivery> iterator = deliveries.iterator();
+        while (iterator.hasNext()) {
+            Delivery d = iterator.next();
+            if (d.getGrade().equals("REJECT")) {
+                iterator.remove();
+
+                List<Delivery> memberList = deliveriesByMember.get(d.getMemberId());
+                if (memberList != null) {
+                    memberList.remove(d);
+                }
+
+                removedCount++;
+            }
+        }
+        return removedCount;
     }
 }
