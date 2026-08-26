@@ -1,6 +1,8 @@
 package mu.rekolt.model;
 
-public class Delivery implements Comparable<Delivery> {
+import java.util.Objects;
+
+public class Delivery implements Payable, Reportable, Comparable<Delivery> {
 
     private final String memberId;
     private final String memberName;
@@ -8,12 +10,24 @@ public class Delivery implements Comparable<Delivery> {
     private final double massKg;
     private final int qualityScore;
     private final int week;
-    private final String grade;
+    private final Grade grade;
     private final double netPayable;
 
     public Delivery(String memberId, String memberName, String produceCode,
                     double massKg, int qualityScore, int week,
-                    String grade, double netPayable) {
+                    Grade grade, double netPayable) {
+        if (memberId == null || memberId.isBlank()) {
+            throw new IllegalArgumentException("Member id cannot be empty.");
+        }
+        if (massKg <= 0 || massKg > 5000) {
+            throw new IllegalArgumentException("Mass must be above 0 and not more than 5000 kg.");
+        }
+        if (qualityScore < 0 || qualityScore > 100) {
+            throw new IllegalArgumentException("Quality score must be between 0 and 100.");
+        }
+        if (week < 1 || week > 20) {
+            throw new IllegalArgumentException("Week must be between 1 and 20.");
+        }
         this.memberId = memberId;
         this.memberName = memberName;
         this.produceCode = produceCode;
@@ -30,13 +44,39 @@ public class Delivery implements Comparable<Delivery> {
     public double getMassKg() { return massKg; }
     public int getQualityScore() { return qualityScore; }
     public int getWeek() { return week; }
-    public String getGrade() { return grade; }
-    public double getNetPayable() { return netPayable; }
+    public Grade getGrade() { return grade; }
 
-    // Natural ordering: highest net payable first.
+    @Override
+    public double getNetPayable() {
+        return netPayable;
+    }
+
+    @Override
+    public String toReportSection() {
+        return String.format("  %-4s %6.1fkg  %-6s %10.2f MUR", produceCode, massKg, grade, netPayable);
+    }
+
+
     @Override
     public int compareTo(Delivery other) {
         return Double.compare(other.netPayable, this.netPayable);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Delivery other)) return false;
+        return Double.compare(massKg, other.massKg) == 0
+                && qualityScore == other.qualityScore
+                && week == other.week
+                && memberId.equals(other.memberId)
+                && produceCode.equals(other.produceCode)
+                && grade == other.grade;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(memberId, produceCode, massKg, qualityScore, week, grade);
     }
 
     @Override
