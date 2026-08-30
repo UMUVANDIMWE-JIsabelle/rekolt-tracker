@@ -7,7 +7,7 @@ one that applies the cooperative's payment rules consistently, and
 then generates the end-of-season payment
 statements as a single Word document.
 
-## The problem this solves
+## The problem Statement
 
 Previously, a treasurer worked through a season's worth of hand-written
 slips with a calculator, which took up to eleven days and led to
@@ -61,7 +61,48 @@ no deductions are taken from it.
   rounded to 2 decimals, using an explicit `(double)` cast on the
   result of `Math.round()` (which returns a `long`).
 
+## Project Structure
+```
+rekolt-tracker/
+│
+├── src/main/java/mu/rekolt/
+│   ├── app/
+│   │   └── Main.java
+│   ├── model/
+│   │   ├── Produce.java
+│   │   ├── CerealProduce.java
+│   │   ├── PerishableProduce.java
+│   │   ├── CashCropProduce.java
+│   │   ├── Grade.java
+│   │   ├── Payable.java
+│   │   ├── Reportable.java
+│   │   ├── Delivery.java
+│   │   ├── Member.java
+│   │   └── SeasonReport.java
+│   ├── service/
+│   │   ├── ProduceCatalog.java
+│   │   ├── PaymentService.java
+│   │   └── ReportWriterService.java
+│   └── util/
+│       └── ConsoleInput.java
+│
+├── docs/
+│   ├── setup/
+│   ├── git/
+│   ├── collections-rationale.md
+│   └── design/
+│       ├── design-v1.pdf
+│       ├── design-v2.pdf
+│       └── change-log.md
+│
+├── output/
+│   ├── season-report.docx
+│   └── run-log.txt
+│
+└── README.md
 
+```
 ## Author
 
 J'Isabelle UMUVANDIMWE
+
