@@ -7,6 +7,10 @@ import mu.rekolt.model.Produce;
 import mu.rekolt.service.PaymentService;
 import mu.rekolt.service.ProduceCatalog;
 import mu.rekolt.util.ConsoleInput;
+import mu.rekolt.model.SeasonReport;
+import mu.rekolt.service.ReportWriterService;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,10 +40,7 @@ public class Main {
             switch (choice) {
                 case 1 -> recordDelivery(input);
                 case 2 -> showSeasonFigures();
-                case 3 -> {
-                    int removed = removeRejectedDeliveries();
-                    System.out.printf("Removed %d REJECT deliveries. %d remain.%n", removed, deliveries.size());
-                }
+                case 3 -> generateSeasonReport();
                 case 4 -> {
                     System.out.println("Goodbye.");
                     running = false;
@@ -53,7 +54,7 @@ public class Main {
     private static void printMenu() {
         System.out.println();
         System.out.println("REKOLT PRODUCE TRACKER");
-        System.out.println("1. Record a delivery          3. Remove REJECT deliveries");
+        System.out.println("1. Record a delivery          3. Generate the season report");
         System.out.println("2. Season figures on screen   4. Exit");
         System.out.println();
     }
@@ -133,6 +134,21 @@ public class Main {
         }
         for (Delivery d : member.getDeliveries()) {
             System.out.println("  " + d);
+        }
+    }
+
+    private static void generateSeasonReport() {
+        SeasonReport report = new SeasonReport();
+        for (Member member : members.values()) {
+            report.addMember(member);
+        }
+
+        System.out.println("Writing output/season-report.docx ...");
+        try {
+            ReportWriterService.generateDocument(report, "output/season-report.docx");
+            System.out.printf("%d member sections, done.%n", report.getMembers().size());
+        } catch (IOException e) {
+            System.out.println("Could not write the report. Check that the output folder exists and is not open in another program, then try again.");
         }
     }
 
