@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 
 
 public class ReportWriterService {
@@ -26,13 +27,11 @@ public class ReportWriterService {
         try (XWPFDocument document = new XWPFDocument();
              FileOutputStream out = new FileOutputStream(outputPath.toFile())) {
 
-            boolean first = true;
+            writeTitleSection(document);
+
             for (Member member : report.getMembers()) {
-                if (!first) {
-                    XWPFParagraph pageBreak = document.createParagraph();
-                    pageBreak.setPageBreak(true);
-                }
-                first = false;
+                XWPFParagraph pageBreak = document.createParagraph();
+                pageBreak.setPageBreak(true);
                 writeMemberSection(document, member);
             }
 
@@ -107,5 +106,21 @@ public class ReportWriterService {
         try (var writer = Files.newBufferedWriter(logPath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             writer.write(line);
         }
+    }
+
+    private static void writeTitleSection(XWPFDocument document) {
+        XWPFParagraph title = document.createParagraph();
+        title.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun titleRun = title.createRun();
+        titleRun.setText("REKOLT Planters' Cooperative - Season Payment Report");
+        titleRun.setBold(true);
+        titleRun.setFontSize(18);
+
+        XWPFParagraph subtitle = document.createParagraph();
+        subtitle.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun subtitleRun = subtitle.createRun();
+        subtitleRun.setText("Payment statement for each member who delivered produce this season, followed by the season total.");
+        subtitleRun.setItalic(true);
+        subtitleRun.setFontSize(11);
     }
 }
